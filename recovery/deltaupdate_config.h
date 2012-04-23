@@ -48,6 +48,9 @@
 //Contains information about delta update package location
 #define FOTA_PROP_FILE    "/data/fota/ipth-muc.prop"
 
+//Predefined AMSS image name
+#define RADIO_IMAGE_LOCATION "/sys_boot/image/AMSS.MBN"
+
 //Contains information about radio delta update
 #define RADIO_DIFF_OUTPUT "/cache/fota/radio.diff"
 

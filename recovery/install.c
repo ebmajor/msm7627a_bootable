@@ -410,8 +410,8 @@ int run_modem_deltaupdate(void)
       */
        char** args = malloc(sizeof(char*) * 5);
        args[0] = RUN_DELTAUPDATE_AGENT;
-       args[1] = "false";
-       args[2] = "AMSS";
+       args[1] = "true";
+       args[2] = RADIO_IMAGE_LOCATION;
        args[3] = RADIO_DIFF_OUTPUT;
        args[4] = "256";
        args[5] = NULL;
@@ -429,6 +429,40 @@ int run_modem_deltaupdate(void)
     }
 
     return INSTALL_SUCCESS;
+}
+
+int get_amss_location(const char* amss_path_name)
+{
+    FILE* fp;
+    int i = 0;
+
+//    while (i++ < 3)
+//    {
+        LOGI("fopen_path %d %s\n", i, amss_path_name);
+//        sleep(1);
+        fp = fopen_path(amss_path_name, "r");
+//        if (fp)
+//            break;
+//    }
+
+    if (fp == NULL)
+    {
+        LOGI("Failed to open %s\n",
+             amss_path_name);
+    }
+    else
+    {
+        fclose(fp);
+    }
+
+    if (access(amss_path_name, F_OK) != 0) {
+        LOGI("amss image does not exist %s\n", amss_path_name);
+        return -1;
+    }
+
+    LOGI("amss image path name: %s\n", amss_path_name);
+
+    return 0;
 }
 
 int start_delta_modemupdate(const char *path)
@@ -450,6 +484,14 @@ int start_delta_modemupdate(const char *path)
        return ret;
     }
 
+    // Check and mount AMSS partition
+    ret = get_amss_location(RADIO_IMAGE_LOCATION);
+    if(ret != 0)
+    {
+       LOGE("get_amss_location returned error(%d)\n", ret);
+       return ret;
+    }
+	
     // Execute modem update using delta update binary
     ret = run_modem_deltaupdate();
     LOGE("modem update result(%d)\n", ret);
